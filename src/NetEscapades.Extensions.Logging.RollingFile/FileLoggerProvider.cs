@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.AzureAppServices.Internal;
 using Microsoft.Extensions.Options;
+using NetEscapades.Extensions.Logging.RollingFile.Internal;
 
 namespace NetEscapades.Extensions.Logging.RollingFile
 {
@@ -24,9 +24,9 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         /// Creates an instance of the <see cref="FileLoggerProvider" /> 
         /// </summary>
         /// <param name="options">The options object controlling the logger</param>
-        public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> options) : base(options)
+        public FileLoggerProvider(IOptions<FileLoggerOptions> options) : base(options)
         {
-            var loggerOptions = options.CurrentValue;
+            var loggerOptions = options.Value;
             _path = loggerOptions.LogDirectory;
             _fileName = loggerOptions.FileName;
             _maxFileSize = loggerOptions.FileSizeLimit;

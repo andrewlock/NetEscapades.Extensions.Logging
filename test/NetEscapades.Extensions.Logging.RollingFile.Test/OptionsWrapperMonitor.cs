@@ -3,21 +3,14 @@ using Microsoft.Extensions.Options;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Test
 {
-    internal class OptionsWrapperMonitor<T> : IOptionsMonitor<T>
+    internal class OptionsWrapper<T> : IOptions<T> where T: class, new()
     {
-        public OptionsWrapperMonitor(T currentValue)
+        public OptionsWrapper(T currentValue)
         {
-            CurrentValue = currentValue;
+            Value = currentValue;
         }
 
-        public IDisposable OnChange(Action<T, string> listener)
-        {
-            return null;
-        }
-
-        public T Get(string name) => CurrentValue;
-
-        public T CurrentValue { get; }
+        public T Value { get; set; }
     }
 
 }

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.AzureAppServices.Internal;
+using NetEscapades.Extensions.Logging.RollingFile.Internal;
 using Xunit;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Test

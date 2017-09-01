@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Extensions.Logging.AzureAppServices.Internal;
+using NetEscapades.Extensions.Logging.RollingFile.Internal;
 
 namespace NetEscapades.Extensions.Logging.RollingFile
 {
@@ -11,14 +11,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private int? _fileSizeLimit = 10 * 1024 * 1024;
         private int? _retainedFileCountLimit = 2;
         private string _fileName = "logs-";
-
-        /// <summary>
-        /// Create a new instance of the options object
-        /// </summary>
-        public FileLoggerOptions()
-        {
-            IsEnabled = true;
-        }
+        
 
         /// <summary>
         /// Gets or sets a strictly positive value representing the maximum log size in bytes or null for no limit.

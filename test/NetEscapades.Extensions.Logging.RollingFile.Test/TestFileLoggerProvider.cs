@@ -13,7 +13,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             string fileName = "LogFile.",
             int maxFileSize = 32_000,
             int maxRetainedFiles = 100)
-            : base(new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
+            : base(new OptionsWrapper<FileLoggerOptions>(new FileLoggerOptions()
             {
                 LogDirectory = path,
                 FileName = fileName,
