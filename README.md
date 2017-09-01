@@ -1,6 +1,6 @@
 # NetEscapades.Extensions.Logging
 
-[![Build status](https://ci.appveyor.com/api/projects/status/9klf04bxncm2pgm4?svg=true)](https://ci.appveyor.com/project/andrewlock/netescapades-configuration)
+[![Build status](https://ci.appveyor.com/api/projects/status/c4qsapcg741rp0b5?svg=true)](https://ci.appveyor.com/project/andrewlock/netescapades-extensions-logging)
 [![NuGet RollingFile](https://img.shields.io/nuget/v/NetEscapades.Extensions.Logging.RollingFile.svg)](https://www.nuget.org/packages/NetEscapades.Extensions.Logging.RollingFile/)
 [![MyGet RollingFile CI](https://img.shields.io/myget/andrewlock-ci/v/NetEscapades.Extensions.Logging.RollingFile.svg)](http://myget.org/gallery/andrewlock-ci)
 
