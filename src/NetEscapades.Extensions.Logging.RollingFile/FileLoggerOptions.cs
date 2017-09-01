@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Logging.AzureAppServices.Internal;
 
-namespace NetEscapades.AspNetCore.Logging.RollingFile
+namespace NetEscapades.Extensions.Logging.RollingFile
 {
     /// <summary>
-    /// Options for Azure diagnostics file logging.
+    /// Options for file logging.
     /// </summary>
     public class FileLoggerOptions : BatchingLoggerOptions
     {
@@ -12,6 +12,9 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
         private int? _retainedFileCountLimit = 2;
         private string _fileName = "logs-";
 
+        /// <summary>
+        /// Create a new instance of the options object
+        /// </summary>
         public FileLoggerOptions()
         {
             IsEnabled = true;
@@ -53,8 +56,8 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
         }
 
         /// <summary>
-        /// Gets or sets a strictly positive value representing the maximum retained file count or null for no limit.
-        /// Defaults to <c>2</c>.
+        /// Gets or sets the filename prefix to use for log files.
+        /// Defaults to <c>logs-</c>.
         /// </summary>
         public string FileName
         {
@@ -69,6 +72,11 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
             }
         }
 
+        /// <summary>
+        /// The directory in which log files will be written, relative to the app process.
+        /// Default to <c>Logs</c>
+        /// </summary>
+        /// <returns></returns>
         public string LogDirectory { get; set; } = "Logs";
     }
 }

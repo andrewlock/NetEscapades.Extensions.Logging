@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
 
-namespace NetEscapades.AspNetCore.Logging.RollingFile.Test
+namespace NetEscapades.Extensions.Logging.RollingFile.Test
 {
     internal class OptionsWrapperMonitor<T> : IOptionsMonitor<T>
     {

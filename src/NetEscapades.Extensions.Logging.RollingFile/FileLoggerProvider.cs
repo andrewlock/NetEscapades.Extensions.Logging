@@ -7,8 +7,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.AzureAppServices.Internal;
 using Microsoft.Extensions.Options;
 
-namespace NetEscapades.AspNetCore.Logging.RollingFile
+namespace NetEscapades.Extensions.Logging.RollingFile
 {
+    /// <summary>
+    /// An <see cref="ILoggerProvider" /> that writes logs to a file
+    /// </summary>
     [ProviderAlias("File")]
     public class FileLoggerProvider : BatchingLoggerProvider
     {
@@ -17,6 +20,10 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
         private readonly int? _maxFileSize;
         private readonly int? _maxRetainedFiles;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="FileLoggerProvider" /> 
+        /// </summary>
+        /// <param name="options">The options object controlling the logger</param>
         public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> options) : base(options)
         {
             var loggerOptions = options.CurrentValue;
@@ -26,6 +33,7 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
         }
 
+        /// <inheritdoc />
         protected override async Task WriteMessagesAsync(IEnumerable<LogMessage> messages, CancellationToken cancellationToken)
         {
             Directory.CreateDirectory(_path);
@@ -56,11 +64,14 @@ namespace NetEscapades.AspNetCore.Logging.RollingFile
             return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.txt");
         }
 
-        public (int Year, int Month, int Day) GetGrouping(LogMessage message)
+        private (int Year, int Month, int Day) GetGrouping(LogMessage message)
         {
             return (message.Timestamp.Year, message.Timestamp.Month, message.Timestamp.Day);
         }
 
+        /// <summary>
+        /// Deletes old log files, keeping a number of files defined by <see cref="FileLoggerOptions.RetainedFileCountLimit" />
+        /// </summary>
         protected void RollFiles()
         {
             if (_maxRetainedFiles > 0)

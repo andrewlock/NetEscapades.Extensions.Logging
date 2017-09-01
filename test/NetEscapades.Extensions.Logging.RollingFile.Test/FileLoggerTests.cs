@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.AzureAppServices.Internal;
 using Xunit;
 
-namespace NetEscapades.AspNetCore.Logging.RollingFile.Test
+namespace NetEscapades.Extensions.Logging.RollingFile.Test
 {
     public class FileLoggerTests : IDisposable
     {

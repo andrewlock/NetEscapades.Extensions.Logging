@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetEscapades.AspNetCore.Logging.RollingFile", "src\NetEscapades.AspNetCore.Logging.RollingFile\NetEscapades.AspNetCore.Logging.RollingFile.csproj", "{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetEscapades.Extensions.Logging.RollingFile", "src\NetEscapades.Extensions.Logging.RollingFile\NetEscapades.Extensions.Logging.RollingFile.csproj", "{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetEscapades.AspNetCore.Logging.RollingFile.Test", "test\NetEscapades.AspNetCore.Logging.RollingFile.Test\NetEscapades.AspNetCore.Logging.RollingFile.Test.csproj", "{953AB66A-9D2B-468C-BC9F-C4EE65256F6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetEscapades.Extensions.Logging.RollingFile.Test", "test\NetEscapades.Extensions.Logging.RollingFile.Test\NetEscapades.Extensions.Logging.RollingFile.Test.csproj", "{953AB66A-9D2B-468C-BC9F-C4EE65256F6C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CD0DEFFC-46ED-4C33-80AD-6ABCD9E55FAD}"
 EndProject
