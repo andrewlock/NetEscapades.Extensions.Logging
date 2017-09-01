@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetEscapades.AspNetCore.Logging.RollingFile", "NetEscapades.AspNetCore.Logging.RollingFile\NetEscapades.AspNetCore.Logging.RollingFile.csproj", "{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EB55AB2-D7F9-49D7-B3DA-3B6C01ADFA5E}
+	EndGlobalSection
+EndGlobal
