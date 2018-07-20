@@ -23,5 +23,13 @@ namespace SampleApp.Controllers
             _logger.LogInformation("Executed Get action");
             return new string[] { "value1", "value2" };
         }
+
+        // GET api/values/error
+        [HttpGet("error")]
+        public string Error()
+        {
+            _logger.LogError("An error occured");
+            return "An error occured";
+        }
     }
 }
