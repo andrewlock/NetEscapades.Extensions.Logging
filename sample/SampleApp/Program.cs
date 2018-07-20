@@ -19,7 +19,21 @@ namespace SampleApp
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging(builder => builder.AddFile())
+                // bind logger configuration from configuration
+                .ConfigureLogging((context, builder) =>
+                {
+                    builder.AddFile(opts =>
+                    {
+                        context.Configuration.GetSection("FileLoggingOptions").Bind(opts);
+                    });
+                })
+                // or alternatively, manually set the options
+                // .ConfigureLogging(builder => builder.AddFile(opts =>
+                // {
+                //     opts.FileName = "app-logs-";
+                //     opts.FileSizeLimit = 1024 * 1024;
+
+                // }))
                 .UseStartup<Startup>()
                 .Build();
     }
