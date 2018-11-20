@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in https://github.com/aspnet/Logging for license information.
+// https://github.com/aspnet/Logging/blob/2d2f31968229eddb57b6ba3d34696ef366a6c71b/src/Microsoft.Extensions.Logging.AzureAppServices/Internal/BatchingLoggerProvider.cs
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,22 +12,28 @@ using Microsoft.Extensions.Options;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 {
-    public abstract class BatchingLoggerProvider : ILoggerProvider
+    public abstract class BatchingLoggerProvider : ILoggerProvider, ISupportExternalScope
     {
         private readonly List<LogMessage> _currentBatch = new List<LogMessage>();
         private readonly TimeSpan _interval;
         private readonly int? _queueSize;
         private readonly int? _batchSize;
+        private readonly IDisposable _optionsChangeToken;
 
         private BlockingCollection<LogMessage> _messageQueue;
         private Task _outputTask;
         private CancellationTokenSource _cancellationTokenSource;
 
-        protected BatchingLoggerProvider(IOptions<BatchingLoggerOptions> options)
-        {
-            // NOTE: Only IsEnabled is monitored
+        private bool _includeScopes;
+        private IExternalScopeProvider _scopeProvider;
 
-            var loggerOptions = options.Value;
+        internal IExternalScopeProvider ScopeProvider => _includeScopes ? _scopeProvider : null;
+
+        protected BatchingLoggerProvider(IOptionsMonitor<BatchingLoggerOptions> options)
+        {
+            // NOTE: Only IsEnabled and IncludeScopes are monitored
+
+            var loggerOptions = options.CurrentValue;
             if (loggerOptions.BatchSize <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(loggerOptions.BatchSize), $"{nameof(loggerOptions.BatchSize)} must be a positive number.");
@@ -37,7 +47,30 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
             _batchSize = loggerOptions.BatchSize;
             _queueSize = loggerOptions.BackgroundQueueSize;
 
-            Start();
+            _optionsChangeToken = options.OnChange(UpdateOptions);
+            UpdateOptions(options.CurrentValue);
+        }
+
+        public bool IsEnabled { get; private set; }
+
+        private void UpdateOptions(BatchingLoggerOptions options)
+        {
+            var oldIsEnabled = IsEnabled;
+            IsEnabled = options.IsEnabled;
+            _includeScopes = options.IncludeScopes;
+
+            if (oldIsEnabled != IsEnabled)
+            {
+                if (IsEnabled)
+                {
+                    Start();
+                }
+                else
+                {
+                    Stop();
+                }
+            }
+
         }
 
         protected abstract Task WriteMessagesAsync(IEnumerable<LogMessage> messages, CancellationToken token);
@@ -124,12 +157,21 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 
         public void Dispose()
         {
-            Stop();
+            _optionsChangeToken?.Dispose();
+            if (IsEnabled)
+            {
+                Stop();
+            }
         }
 
         public ILogger CreateLogger(string categoryName)
         {
             return new BatchingLogger(this, categoryName);
+        }
+
+        void ISupportExternalScope.SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            _scopeProvider = scopeProvider;
         }
     }
 }

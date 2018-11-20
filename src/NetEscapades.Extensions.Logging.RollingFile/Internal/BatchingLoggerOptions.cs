@@ -1,11 +1,15 @@
-﻿using System;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in https://github.com/aspnet/Logging for license information.
+// https://github.com/aspnet/Logging/blob/2d2f31968229eddb57b6ba3d34696ef366a6c71b/src/Microsoft.Extensions.Logging.AzureAppServices/Internal/BatchingLoggerOptions.cs
+
+using System;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 {
     public class BatchingLoggerOptions
     {
-        private int? _batchSize = 32;
-        private int? _backgroundQueueSize;
+        private int? _batchSize;
+        private int? _backgroundQueueSize = 1000;
         private TimeSpan _flushPeriod = TimeSpan.FromSeconds(1);
 
         /// <summary>
@@ -27,7 +31,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
         /// <summary>
         /// Gets or sets the maximum size of the background log message queue or null for no limit.
         /// After maximum queue size is reached log event sink would start blocking.
-        /// Defaults to <c>null</c>.
+        /// Defaults to <c>1000</c>.
         /// </summary>
         public int? BackgroundQueueSize
         {
@@ -45,6 +49,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
         /// <summary>
         /// Gets or sets a maximum number of events to include in a single batch or null for no limit.
         /// </summary>
+        /// Defaults to <c>null</c>.
         public int? BatchSize
         {
             get { return _batchSize; }
@@ -62,5 +67,11 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
         /// Gets or sets value indicating if logger accepts and queues writes.
         /// </summary>
         public bool IsEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether scopes should be included in the message.
+        /// Defaults to <c>false</c>.
+        /// </summary>
+        public bool IncludeScopes { get; set; } = false;
     }
 }
