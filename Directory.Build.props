@@ -1,0 +1,23 @@
+<Project>
+
+  <Import Project="version.props" />
+
+  <PropertyGroup>
+    <Authors>Andrew Lock</Authors>
+    <Product>NetEscapades.AspNetCore.Logging.RollingFile</Product>
+    <Copyright>Copyright © AndrewLock</Copyright>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/andrewlock/NetEscapades.Extensions.Logging.RollingFile/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/andrewlock/NetEscapades.Extensions.Logging</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/andrewlock/NetEscapades.Extensions.Logging.RollingFile</RepositoryUrl><RepositoryType>git</RepositoryType>
+    <RepositoryType>git</RepositoryType>
+    <DebugType>embedded</DebugType>
+    <IsPackable>false</IsPackable>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <Import Project="releasenotes.props" />
+
+</Project>

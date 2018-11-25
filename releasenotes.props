@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.0.0'">
+      <![CDATA[
+
+Features:
+
+* Add support for recording scopes in the rolling files
+
+Breaking Changes:
+
+* Requires ASP.NET Core 2.1 (previously was ASP.NET Core 2.0)
+
+]]>
+    </PackageReleaseNotes>
+     <PackageReleaseNotes>$(PackageReleaseNotes)
+See $(PackageProjectUrl)/blob/master/CHANGELOG.md#v$(VersionPrefix.Replace('.','')) for more details.</PackageReleaseNotes>
+  </PropertyGroup>
+</Project>
