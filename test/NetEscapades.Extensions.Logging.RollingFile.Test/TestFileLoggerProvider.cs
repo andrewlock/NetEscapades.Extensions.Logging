@@ -12,14 +12,16 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             string path,
             string fileName = "LogFile.",
             int maxFileSize = 32_000,
-            int maxRetainedFiles = 100)
-            : base(new OptionsWrapper<FileLoggerOptions>(new FileLoggerOptions()
+            int maxRetainedFiles = 100,
+            bool includeScopes = false)
+            : base(new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
             {
                 LogDirectory = path,
                 FileName = fileName,
                 FileSizeLimit = maxFileSize,
                 RetainedFileCountLimit = maxRetainedFiles,
-                IsEnabled = true
+                IsEnabled = true,
+                IncludeScopes = includeScopes
             }))
         {
         }

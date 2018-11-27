@@ -116,5 +116,35 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 "randomFile.txt"
             }, actualFiles);
         }
+
+
+        [Fact]
+        public async Task IncludesScopesWhenEnabled()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, includeScopes: true);
+
+            // this would normally be done by the ILoggerFactory
+            ((ISupportExternalScope)provider).SetScopeProvider(new LoggerExternalScopeProvider());
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+
+            await provider.IntervalControl.Pause;
+            using (logger.BeginScope("Entering Scope <{ScopeName}>", "test"))
+            {
+                logger.Log(_timestampOne, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+            }
+
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            Assert.Equal(
+                "2016-05-04 03:02:01.000 +00:00 [Information] Cat => Entering Scope <test>:"+ Environment.NewLine + 
+                "Info message" + Environment.NewLine +
+                "2016-05-04 04:02:01.000 +00:00 [Error] Cat:" + Environment.NewLine +
+                "Error message" + Environment.NewLine,
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.txt")));
+        }
     }
 }

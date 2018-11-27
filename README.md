@@ -6,7 +6,7 @@
 
 ## NetEscapades.Extensions.Logging.RollingFile
 
-A rolling file provider for ASP.NET Core 2.0 [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core. Writes logs to a set of text files, one per day.
+A rolling file provider for ASP.NET Core 2.1 [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core. Writes logs to a set of text files, one per day.
 
 ### Getting Started 
 

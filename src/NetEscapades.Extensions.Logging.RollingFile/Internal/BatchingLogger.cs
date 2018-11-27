@@ -1,5 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in https://github.com/aspnet/Logging for license information.
+// https://github.com/aspnet/Logging/blob/2d2f31968229eddb57b6ba3d34696ef366a6c71b/src/Microsoft.Extensions.Logging.AzureAppServices/Internal/BatchingLogger.cs
+
+using System;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -18,16 +21,13 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            return null;
+            // NOTE: Differs from source
+            return _provider.ScopeProvider?.Push(state);
         }
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            if (logLevel == LogLevel.None)
-            {
-                return false;
-            }
-            return true;
+            return _provider.IsEnabled;
         }
 
         public void Log<TState>(DateTimeOffset timestamp, LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
@@ -43,7 +43,22 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
             builder.Append(logLevel.ToString());
             builder.Append("] ");
             builder.Append(_category);
-            builder.Append(": ");
+
+            var scopeProvider = _provider.ScopeProvider;
+            if (scopeProvider != null)
+            {
+                scopeProvider.ForEachScope((scope, stringBuilder) =>
+                {
+                    stringBuilder.Append(" => ").Append(scope);
+                }, builder);
+
+                builder.AppendLine(":");
+            }
+            else
+            {
+                builder.Append(": ");
+            }
+
             builder.AppendLine(formatter(state, exception));
 
             if (exception != null)

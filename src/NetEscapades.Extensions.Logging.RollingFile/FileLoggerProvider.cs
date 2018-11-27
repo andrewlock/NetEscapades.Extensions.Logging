@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in https://github.com/aspnet/Logging for license information.
+// https://github.com/aspnet/Logging/blob/2d2f31968229eddb57b6ba3d34696ef366a6c71b/src/Microsoft.Extensions.Logging.AzureAppServices/Internal/FileLoggerProvider.cs
+
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -24,9 +28,9 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         /// Creates an instance of the <see cref="FileLoggerProvider" /> 
         /// </summary>
         /// <param name="options">The options object controlling the logger</param>
-        public FileLoggerProvider(IOptions<FileLoggerOptions> options) : base(options)
+        public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> options) : base(options)
         {
-            var loggerOptions = options.Value;
+            var loggerOptions = options.CurrentValue;
             _path = loggerOptions.LogDirectory;
             _fileName = loggerOptions.FileName;
             _maxFileSize = loggerOptions.FileSizeLimit;
