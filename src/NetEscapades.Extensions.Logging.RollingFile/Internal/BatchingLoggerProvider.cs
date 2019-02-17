@@ -75,7 +75,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 
         protected abstract Task WriteMessagesAsync(IEnumerable<LogMessage> messages, CancellationToken token);
 
-        private async Task ProcessLogQueue(object state)
+        private async Task ProcessLogQueue()
         {
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
@@ -132,10 +132,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
                 new BlockingCollection<LogMessage>(new ConcurrentQueue<LogMessage>(), _queueSize.Value);
 
             _cancellationTokenSource = new CancellationTokenSource();
-            _outputTask = Task.Factory.StartNew<Task>(
-                ProcessLogQueue,
-                null,
-                TaskCreationOptions.LongRunning);
+            _outputTask = Task.Run(ProcessLogQueue);
         }
 
         private void Stop()
