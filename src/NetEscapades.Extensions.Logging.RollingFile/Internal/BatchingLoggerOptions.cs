@@ -66,7 +66,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
         /// <summary>
         /// Gets or sets value indicating if logger accepts and queues writes.
         /// </summary>
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether scopes should be included in the message.
