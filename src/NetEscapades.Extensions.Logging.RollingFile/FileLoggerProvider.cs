@@ -21,6 +21,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
     {
         private readonly string _path;
         private readonly string _fileName;
+        private readonly string _extension;
         private readonly int? _maxFileSize;
         private readonly int? _maxRetainedFiles;
 
@@ -33,6 +34,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             var loggerOptions = options.CurrentValue;
             _path = loggerOptions.LogDirectory;
             _fileName = loggerOptions.FileName;
+            _extension = loggerOptions.Extension;
             _maxFileSize = loggerOptions.FileSizeLimit;
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
         }
@@ -65,7 +67,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
         private string GetFullName((int Year, int Month, int Day) group)
         {
-            return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.txt");
+            return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.{_extension}");
         }
 
         private (int Year, int Month, int Day) GetGrouping(LogMessage message)

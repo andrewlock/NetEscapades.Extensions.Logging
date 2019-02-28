@@ -146,5 +146,65 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 "Error message" + Environment.NewLine,
                 File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.txt")));
         }
+
+        [Fact]
+        public async Task CorrectlySetsFileExtensionWithDot()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: ".log");
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            logger.Log(_timestampOne, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            Assert.Equal(
+                "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
+                "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.log")));
+        }
+
+        [Fact]
+        public async Task CorrectlySetsFileExtensionWithoutDot()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: "log");
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            logger.Log(_timestampOne, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            Assert.Equal(
+                "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
+                "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.log")));
+        }
+
+        [Fact]
+        public async Task CorrectlyHandlesNullFileExtension()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: null);
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            logger.Log(_timestampOne, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            Assert.Equal(
+                "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
+                "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
+        }
     }
 }

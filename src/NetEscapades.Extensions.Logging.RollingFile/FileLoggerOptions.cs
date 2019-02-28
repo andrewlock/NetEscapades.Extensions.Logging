@@ -11,6 +11,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private int? _fileSizeLimit = 10 * 1024 * 1024;
         private int? _retainedFileCountLimit = 2;
         private string _fileName = "logs-";
+        private string _extension = "txt";
         
 
         /// <summary>
@@ -63,6 +64,17 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                 }
                 _fileName = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the filename extension to use for log files.
+        /// Defaults to <c>txt</c>.
+        /// Will strip any prefixed .
+        /// </summary>
+        public string Extension
+        {
+            get { return _extension; }
+            set { _extension = value?.TrimStart('.'); }
         }
 
         /// <summary>

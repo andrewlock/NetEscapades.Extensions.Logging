@@ -11,6 +11,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
         public TestFileLoggerProvider(
             string path,
             string fileName = "LogFile.",
+            string extension = "txt",
             int maxFileSize = 32_000,
             int maxRetainedFiles = 100,
             bool includeScopes = false)
@@ -18,6 +19,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             {
                 LogDirectory = path,
                 FileName = fileName,
+                Extension = extension,
                 FileSizeLimit = maxFileSize,
                 RetainedFileCountLimit = maxRetainedFiles,
                 IsEnabled = true,
