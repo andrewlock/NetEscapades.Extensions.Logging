@@ -56,6 +56,7 @@ public class Program
                 options.FileName = "diagnostics-"; // The log file prefixes
                 options.LogDirectory = "LogFiles"; // The directory to write the logs
                 options.FileSizeLimit = 20 * 1024 * 1024; // The maximum log file size (20MB here)
+                options.Extension = "txt" // The log file extension
             })) 
             .UseStartup<Startup>()
             .Build();

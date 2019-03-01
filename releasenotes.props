@@ -1,15 +1,11 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.0.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.1.0'">
       <![CDATA[
 
 Features:
 
-* Add support for recording scopes in the rolling files
-
-Breaking Changes:
-
-* Requires ASP.NET Core 2.1 (previously was ASP.NET Core 2.0)
+* Allow specifying the file extension for log files. Defaults to txt. #9 (thanks @BrendanCosman)
 
 ]]>
     </PackageReleaseNotes>
