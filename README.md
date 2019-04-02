@@ -56,14 +56,15 @@ public class Program
                 options.FileName = "diagnostics-"; // The log file prefixes
                 options.LogDirectory = "LogFiles"; // The directory to write the logs
                 options.FileSizeLimit = 20 * 1024 * 1024; // The maximum log file size (20MB here)
-                options.Extension = "txt" // The log file extension
+                options.Extension = "txt"; // The log file extension
+                options.Periodicity = PeriodicityOptions.Hourly // Roll log files hourly instead of daily.
             })) 
             .UseStartup<Startup>()
             .Build();
 }
 ```
 
-**Finally** The provider will create log files prefixed with the `FileName`, and suffixed with the current date in the `yyyyMMdd` format.
+**Finally** The provider will create log files prefixed with the `FileName`, and suffixed with the current date in the `yyyyMMddHHmm` format (using only the portions up to the selected periodicity, `yyyyMMdd` for the defauly of daily).
 
 ```
 log-20160631.txt
