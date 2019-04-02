@@ -24,6 +24,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private readonly string _extension;
         private readonly int? _maxFileSize;
         private readonly int? _maxRetainedFiles;
+        private readonly PeriodicityOptions _periodicity;
 
         /// <summary>
         /// Creates an instance of the <see cref="FileLoggerProvider" /> 
@@ -37,6 +38,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             _extension = loggerOptions.Extension;
             _maxFileSize = loggerOptions.FileSizeLimit;
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
+            _periodicity = loggerOptions.Periodicity;
         }
 
         /// <inheritdoc />
@@ -65,14 +67,24 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             RollFiles();
         }
 
-        private string GetFullName((int Year, int Month, int Day) group)
+        private string GetFullName((int Year, int Month, int Day, int Hour, int Minute) group)
         {
-            return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.{_extension}");
+            switch (_periodicity) {
+                case PeriodicityOptions.Minutely:
+                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}{group.Minute:00}.{_extension}");
+                case PeriodicityOptions.Hourly:
+                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}.{_extension}");
+                case PeriodicityOptions.Daily:
+                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.{_extension}");
+                case PeriodicityOptions.Monthly:
+                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}.{_extension}");
+            }
+            throw new InvalidDataException("Invalid periodicity");
         }
 
-        private (int Year, int Month, int Day) GetGrouping(LogMessage message)
+        private (int Year, int Month, int Day, int Hour, int Minute) GetGrouping(LogMessage message)
         {
-            return (message.Timestamp.Year, message.Timestamp.Month, message.Timestamp.Day);
+            return (message.Timestamp.Year, message.Timestamp.Month, message.Timestamp.Day, message.Timestamp.Hour, message.Timestamp.Minute);
         }
 
         /// <summary>
