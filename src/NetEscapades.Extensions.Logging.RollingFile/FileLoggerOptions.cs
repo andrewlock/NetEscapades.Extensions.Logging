@@ -12,7 +12,6 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private int? _retainedFileCountLimit = 2;
         private string _fileName = "logs-";
         private string _extension = "txt";
-        private PeriodicityOptions _periodicity = PeriodicityOptions.Daily;
         
 
         /// <summary>
@@ -81,11 +80,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         /// <summary>
         /// Gets or sets the periodicity for rolling over log files.
         /// </summary>
-        public PeriodicityOptions Periodicity
-        {
-            get { return _periodicity; }
-            set { _periodicity = value; }
-        }
+        public PeriodicityOptions Periodicity { get ;set; } = PeriodicityOptions.Daily;
 
         /// <summary>
         /// The directory in which log files will be written, relative to the app process.
