@@ -1,5 +1,11 @@
 # Changelog
 
+## [v2.2.0]
+
+Features
+
+* Allow specifying the periodicity for rolling log files. Defaults to Daily as before. [#15](https://github.com/andrewlock/NetEscapades.Extensions.Logging/pull/15) (thanks [@RyanGrange](https://github.com/RyanGrange))
+
 ## [v2.1.0]
 
 Features

@@ -1,11 +1,11 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.1.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.2.0'">
       <![CDATA[
 
 Features:
 
-* Allow specifying the file extension for log files. Defaults to txt. #9 (thanks @BrendanCosman)
+* Allow specifying the periodicity for rolling log files. Defaults to Daily as before. #15 (thanks @RyanGrange)
 
 ]]>
     </PackageReleaseNotes>
