@@ -64,7 +64,7 @@ public class Program
 }
 ```
 
-**Finally** The provider will create log files prefixed with the `FileName`, and suffixed with the current date in the `yyyyMMddHHmm` format (using only the portions up to the selected periodicity, `yyyyMMdd` for the defauly of daily).
+**Finally** The provider will create log files prefixed with the `FileName`, and suffixed with the current date in the `yyyyMMddHHmm` format (using only the portions up to the selected periodicity, `yyyyMMdd` for the default of daily).
 
 ```
 log-20160631.txt
