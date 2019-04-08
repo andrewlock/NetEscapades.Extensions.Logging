@@ -17,7 +17,7 @@ deploy:
 - provider: NuGet
   server: https://www.myget.org/F/andrewlock-ci/api/v2/package
   api_key:
-    secure: 7XbdNq38u0JLRNc9pRl35WPi5LZopfYcoCslf7Er/eTreR5mZnGbmY/lVQYcgxI2
+    secure: TPK0GvUiH+cL18XmUV2bmJBhzohKTRkfo9NjuiHC0z/YmIEEDuyzDOn9vlUj8mGr
   skip_symbols: true
   on:
     branch: master
