@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in https://github.com/aspnet/Logging for license information.
 // https://github.com/aspnet/Logging/blob/2d2f31968229eddb57b6ba3d34696ef366a6c71b/src/Microsoft.Extensions.Logging.AzureAppServices/Internal/FileLoggerProvider.cs
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -48,9 +50,9 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
             foreach (var group in messages.GroupBy(GetGrouping))
             {
-                var fullName = GetFullName(group.Key);
-                var fileInfo = new FileInfo(fullName);
-                if (_maxFileSize > 0 && fileInfo.Exists && fileInfo.Length > _maxFileSize)
+                var fullName = GetLogFile(@group);
+
+                if (fullName == null)
                 {
                     return;
                 }
@@ -67,19 +69,82 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             RollFiles();
         }
 
-        private string GetFullName((int Year, int Month, int Day, int Hour, int Minute) group)
+        private string GetLogFile(IGrouping<(int Year, int Month, int Day, int Hour, int Minute), LogMessage> fileNameGrouping)
         {
-            switch (_periodicity) {
+            var counter = GetCurrentCounter(GetBaseName(fileNameGrouping.Key));
+            
+            while (counter < 2000)
+            {
+                var fullName = GetFullName(fileNameGrouping.Key, counter);
+                var fileInfo = new FileInfo(fullName);
+                if (_maxFileSize > 0 && fileInfo.Exists && fileInfo.Length > _maxFileSize)
+                {
+                    counter++;
+                    continue;
+                }
+
+                return fullName;
+            }
+
+            return null;
+        }
+
+        private int GetCurrentCounter(string baseName)
+        {
+            try
+            {
+                var files = Directory.GetFiles(_path, $"{baseName}*.{_extension}");
+                if (files.Length == 0)
+                {
+                    // No rolling file currently exists with the base name as pattern
+                    return 0;
+                }
+
+                // Get file with highest counter
+                var latestFile = files.OrderByDescending(file => file).First();
+
+                var fileWithoutPrefix = latestFile.Substring(Path.Combine(_path, baseName).Length + 1);
+                if (fileWithoutPrefix.IndexOf(".", StringComparison.Ordinal) < 0)
+                {
+                    // No additional dot could be found
+                    return 0;
+                }
+
+                var counterString = fileWithoutPrefix.Substring(0, fileWithoutPrefix.IndexOf(".", StringComparison.Ordinal));
+                if (int.TryParse(counterString, out var counter))
+                {
+                    return counter;
+                }
+
+                return 0;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
+        }
+
+        private string GetBaseName((int Year, int Month, int Day, int Hour, int Minute) group)
+        {
+            switch (_periodicity)
+            {
                 case PeriodicityOptions.Minutely:
-                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}{group.Minute:00}.{_extension}");
+                    return $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}{group.Minute:00}";
                 case PeriodicityOptions.Hourly:
-                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}.{_extension}");
+                    return $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}{group.Hour:00}";
                 case PeriodicityOptions.Daily:
-                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}.{_extension}");
+                    return $"{_fileName}{group.Year:0000}{group.Month:00}{group.Day:00}";
                 case PeriodicityOptions.Monthly:
-                    return Path.Combine(_path, $"{_fileName}{group.Year:0000}{group.Month:00}.{_extension}");
+                    return $"{_fileName}{group.Year:0000}{group.Month:00}";
             }
             throw new InvalidDataException("Invalid periodicity");
+        }
+
+        private string GetFullName((int Year, int Month, int Day, int Hour, int Minute) group, int counter)
+        {
+            var baseName = GetBaseName(group);
+            return Path.Combine(_path,$"{baseName}.{counter}.{_extension}");
         }
 
         private (int Year, int Month, int Day, int Hour, int Minute) GetGrouping(LogMessage message)
