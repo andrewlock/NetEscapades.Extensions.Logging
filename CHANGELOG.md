@@ -2,11 +2,13 @@
 
 ## [v2.3.0]
 
+* Add support for .NET Core 3.0
+
 ## [v2.2.0]
 
 Features
 
-* Add support for .NET Core 3.0
+* Allow specifying the periodicity for rolling log files. Defaults to Daily as before. [#15](https://github.com/andrewlock/NetEscapades.Extensions.Logging/pull/15) (thanks [@RyanGrange](https://github.com/RyanGrange))
 
 ## [v2.1.0]
 
