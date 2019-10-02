@@ -1,11 +1,11 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.2.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.3.0'">
       <![CDATA[
 
 Features:
 
-* Allow specifying the periodicity for rolling log files. Defaults to Daily as before. #15 (thanks @RyanGrange)
+* Add support for .NET Core 3.0
 
 ]]>
     </PackageReleaseNotes>
