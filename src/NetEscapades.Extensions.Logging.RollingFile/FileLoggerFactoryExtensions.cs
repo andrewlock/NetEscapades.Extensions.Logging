@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.Logging
         /// <param name="filename">Sets the filename prefix to use for log files</param>
         public static ILoggingBuilder AddFile(this ILoggingBuilder builder, string filename)
         {
-            builder.AddFile(options => options.FileName = "log-");
+            builder.AddFile(options => options.FileName = filename);
             return builder;
         }
 
