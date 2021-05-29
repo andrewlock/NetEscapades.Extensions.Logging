@@ -10,14 +10,15 @@ namespace NetEscapades.Extensions.Logging.RollingFile
     {
         private int? _fileSizeLimit = 10 * 1024 * 1024;
         private int? _retainedFileCountLimit = 2;
+        private int? _filesPerPeriodicityLimit = 10;
         private string _fileName = "logs-";
         private string _extension = "txt";
         
 
         /// <summary>
         /// Gets or sets a strictly positive value representing the maximum log size in bytes or null for no limit.
-        /// Once the log is full, no more messages will be appended.
-        /// Defaults to <c>10MB</c>.
+        /// Once the log is full, no more messages will be appended, unless <see cref="FilesPerPeriodicityLimit"/>
+        /// is greater than 1. Defaults to <c>10MB</c>.
         /// </summary>
         public int? FileSizeLimit
         {
@@ -29,6 +30,24 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                     throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(FileSizeLimit)} must be positive.");
                 }
                 _fileSizeLimit = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value representing the maximum number of files allowed for a given <see cref="Periodicity"/> .
+        /// Once the specified number of logs per periodicity are created, no more log files will be created. Note that these extra files
+        /// do not count towards the RetrainedFileCountLimit. Defaults to <c>1</c>.
+        /// </summary>
+        public int? FilesPerPeriodicityLimit
+        {
+            get { return _filesPerPeriodicityLimit; }
+            set
+            {
+                if (value <= 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(FilesPerPeriodicityLimit)} must be greater than 0.");
+                }
+                _filesPerPeriodicityLimit = value;
             }
         }
 

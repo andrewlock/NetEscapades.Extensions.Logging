@@ -14,6 +14,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             string extension = "txt",
             int maxFileSize = 32_000,
             int maxRetainedFiles = 100,
+            int maxFilesPerPeriodicity = 1,
             bool includeScopes = false)
             : base(new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
             {
@@ -22,6 +23,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 Extension = extension,
                 FileSizeLimit = maxFileSize,
                 RetainedFileCountLimit = maxRetainedFiles,
+                FilesPerPeriodicityLimit = maxFilesPerPeriodicity,
                 IsEnabled = true,
                 IncludeScopes = includeScopes
             }))

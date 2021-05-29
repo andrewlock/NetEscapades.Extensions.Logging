@@ -51,7 +51,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             Assert.Equal(
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0.txt")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.txt")));
         }
 
         [Fact]
@@ -70,21 +70,72 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
 
             Assert.Equal(
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0.txt")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.txt")));
 
             Assert.Equal(
                 "2016-05-05 03:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160505.0.txt")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160505.txt")));
         }
 
         [Fact]
         public async Task RespectsMaxFileCount()
         {
+            var provider = new TestFileLoggerProvider(TempPath, maxRetainedFiles: 5);
+            var expectedFilenames = new[]
+            {
+                "LogFile.20160509.txt",
+                "LogFile.20160510.txt",
+                "LogFile.20160511.txt",
+                "LogFile.20160512.txt",
+                "LogFile.20160513.txt",
+                "randomFile.txt"
+            };
+            await AssertExpectedFilenames(provider, expectedFilenames);
+        }
+
+        [Fact]
+        public async Task RespectsMaxFileCountWithMultiFilePeriodicity()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, maxRetainedFiles: 5, maxFilesPerPeriodicity: 5);
+            var expectedFilenames = new[]
+            {
+                "LogFile.20160509.0.txt",
+                "LogFile.20160510.0.txt",
+                "LogFile.20160511.0.txt",
+                "LogFile.20160512.0.txt",
+                "LogFile.20160513.0.txt",
+                "randomFile.txt"
+            };
+            await AssertExpectedFilenames(provider, expectedFilenames);
+        }
+
+        [Fact]
+        public async Task RespectsMaxFileCountWithMultiFilePeriodicity2()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, maxRetainedFiles: 5, maxFilesPerPeriodicity: 5, maxFileSize: 1);
+            var expectedFilenames = new[]
+            {
+                "LogFile.20160509.0.txt",
+                "LogFile.20160509.1.txt",
+                "LogFile.20160510.0.txt",
+                "LogFile.20160510.1.txt",
+                "LogFile.20160511.0.txt",
+                "LogFile.20160511.1.txt",
+                "LogFile.20160512.0.txt",
+                "LogFile.20160512.1.txt",
+                "LogFile.20160513.0.txt",
+                "LogFile.20160513.1.txt",
+                "randomFile.txt"
+            };
+            await AssertExpectedFilenames(provider, expectedFilenames);
+        }
+
+        async Task AssertExpectedFilenames(TestFileLoggerProvider provider, string[] expectedFilenames)
+        {
             Directory.CreateDirectory(TempPath);
             File.WriteAllText(Path.Combine(TempPath, "randomFile.txt"), "Text");
 
-            var provider = new TestFileLoggerProvider(TempPath, maxRetainedFiles: 5);
-            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+            var logger = (BatchingLogger) provider.CreateLogger("Cat");
 
             await provider.IntervalControl.Pause;
             var timestamp = _timestampOne;
@@ -92,6 +143,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             for (int i = 0; i < 10; i++)
             {
                 logger.Log(timestamp, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+                logger.Log(timestamp.AddSeconds(1), LogLevel.Information, 0, "Info message", null, (state, ex) => state);
                 logger.Log(timestamp.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
 
                 timestamp = timestamp.AddDays(1);
@@ -107,16 +159,8 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 .ToArray();
 
             Assert.Equal(6, actualFiles.Length);
-            Assert.Equal(new[] {
-                "LogFile.20160509.0.txt",
-                "LogFile.20160510.0.txt",
-                "LogFile.20160511.0.txt",
-                "LogFile.20160512.0.txt",
-                "LogFile.20160513.0.txt",
-                "randomFile.txt"
-            }, actualFiles);
+            Assert.Equal(expectedFilenames, actualFiles);
         }
-
 
         [Fact]
         public async Task IncludesScopesWhenEnabled()

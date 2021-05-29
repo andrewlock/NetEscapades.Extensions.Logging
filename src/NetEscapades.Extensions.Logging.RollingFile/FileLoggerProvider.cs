@@ -26,6 +26,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private readonly string _extension;
         private readonly int? _maxFileSize;
         private readonly int? _maxRetainedFiles;
+        private readonly int? _maxFileCount;
         private readonly PeriodicityOptions _periodicity;
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             _extension = loggerOptions.Extension;
             _maxFileSize = loggerOptions.FileSizeLimit;
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
+            _maxFileCount = loggerOptions.FilesPerPeriodicityLimit;
             _periodicity = loggerOptions.Periodicity;
         }
 
@@ -50,7 +52,8 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
             foreach (var group in messages.GroupBy(GetGrouping))
             {
-                var fullName = GetLogFile(@group);
+                var baseName = GetBaseName(group.Key);
+                var fullName = GetLogFilePath(baseName, group.Key);
 
                 if (fullName == null)
                 {
@@ -69,15 +72,20 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             RollFiles();
         }
 
-        private string GetLogFile(IGrouping<(int Year, int Month, int Day, int Hour, int Minute), LogMessage> fileNameGrouping)
+        private string GetLogFilePath(string baseName, (int Year, int Month, int Day, int Hour, int Minute) fileNameGrouping)
         {
-            var counter = GetCurrentCounter(GetBaseName(fileNameGrouping.Key));
-            
-            while (counter < 2000)
+            if (IsMultiFileEnabled())
             {
-                var fullName = GetFullName(fileNameGrouping.Key, counter);
-                var fileInfo = new FileInfo(fullName);
-                if (_maxFileSize > 0 && fileInfo.Exists && fileInfo.Length > _maxFileSize)
+                var fullPath = Path.Combine(_path, $"{baseName}.{_extension}");
+                return IsAvailable(fullPath) ? fullPath : null;
+            }
+
+            var counter = GetCurrentCounter(baseName);
+
+            while (counter < _maxFileCount)
+            {
+                var fullName = Path.Combine(_path,$"{baseName}.{counter}.{_extension}");
+                if (!IsAvailable(fullName))
                 {
                     counter++;
                     continue;
@@ -87,13 +95,21 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             }
 
             return null;
+
+            bool IsAvailable(string filename)
+            {
+                var fileInfo = new FileInfo(filename);
+                return !(_maxFileSize > 0 && fileInfo.Exists && fileInfo.Length > _maxFileSize);
+            }
+
+            bool IsMultiFileEnabled() => (_maxFileCount ?? 1) == 1;
         }
 
         private int GetCurrentCounter(string baseName)
         {
             try
             {
-                var files = Directory.GetFiles(_path, $"{baseName}*.{_extension}");
+                var files = Directory.GetFiles(_path, $"{baseName}.*{_extension}");
                 if (files.Length == 0)
                 {
                     // No rolling file currently exists with the base name as pattern
@@ -103,15 +119,19 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                 // Get file with highest counter
                 var latestFile = files.OrderByDescending(file => file).First();
 
-                var fileWithoutPrefix = latestFile.Substring(Path.Combine(_path, baseName).Length + 1);
-                if (fileWithoutPrefix.IndexOf(".", StringComparison.Ordinal) < 0)
+                var baseNameLength = Path.Combine(_path, baseName).Length + 1;
+                var fileWithoutPrefix = latestFile
+                    .AsSpan()
+                    .Slice(baseNameLength);
+                var indexOfPeriod = fileWithoutPrefix.IndexOf('.');
+                if (indexOfPeriod < 0)
                 {
                     // No additional dot could be found
                     return 0;
                 }
 
-                var counterString = fileWithoutPrefix.Substring(0, fileWithoutPrefix.IndexOf(".", StringComparison.Ordinal));
-                if (int.TryParse(counterString, out var counter))
+                var counterSpan = fileWithoutPrefix.Slice(0, indexOfPeriod);
+                if (int.TryParse(counterSpan.ToString(), out var counter))
                 {
                     return counter;
                 }
@@ -139,12 +159,6 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                     return $"{_fileName}{group.Year:0000}{group.Month:00}";
             }
             throw new InvalidDataException("Invalid periodicity");
-        }
-
-        private string GetFullName((int Year, int Month, int Day, int Hour, int Minute) group, int counter)
-        {
-            var baseName = GetBaseName(group);
-            return Path.Combine(_path,$"{baseName}.{counter}.{_extension}");
         }
 
         private (int Year, int Month, int Day, int Hour, int Minute) GetGrouping(LogMessage message)
