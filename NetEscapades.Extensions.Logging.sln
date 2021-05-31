@@ -19,12 +19,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{E5D009
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreApp3", "sample\NetCoreApp3\NetCoreApp3.csproj", "{66CE94E5-791A-4CAC-8F83-9EF78F5C59E0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{0D20A367-4F3D-454A-BDF7-DE1801F0B9F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D20A367-4F3D-454A-BDF7-DE1801F0B9F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D20A367-4F3D-454A-BDF7-DE1801F0B9F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCDA4B5E-6B70-4805-828E-6F9249D3B47D}.Release|Any CPU.ActiveCfg = Release|Any CPU
