@@ -16,7 +16,14 @@
 
 name: BuildAndPack
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - '*'
 
 jobs:
   ubuntu-latest:
