@@ -43,7 +43,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             get { return _filesPerPeriodicityLimit; }
             set
             {
-                if (value <= 1)
+                if (value <= 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value), $"{nameof(FilesPerPeriodicityLimit)} must be greater than 0.");
                 }

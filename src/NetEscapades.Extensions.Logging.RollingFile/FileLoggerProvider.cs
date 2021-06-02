@@ -26,7 +26,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private readonly string _extension;
         private readonly int? _maxFileSize;
         private readonly int? _maxRetainedFiles;
-        private readonly int? _maxFileCount;
+        private readonly int _maxFileCountPerPeriodicity;
         private readonly PeriodicityOptions _periodicity;
 
         /// <summary>
@@ -41,9 +41,10 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             _extension = loggerOptions.Extension;
             _maxFileSize = loggerOptions.FileSizeLimit;
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
-            _maxFileCount = loggerOptions.FilesPerPeriodicityLimit;
+            _maxFileCountPerPeriodicity = loggerOptions.FilesPerPeriodicityLimit ?? 1;
             _periodicity = loggerOptions.Periodicity;
         }
+
 
         /// <inheritdoc />
         protected override async Task WriteMessagesAsync(IEnumerable<LogMessage> messages, CancellationToken cancellationToken)
@@ -74,7 +75,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
         private string GetLogFilePath(string baseName, (int Year, int Month, int Day, int Hour, int Minute) fileNameGrouping)
         {
-            if (IsMultiFileEnabled())
+            if (_maxFileCountPerPeriodicity == 1)
             {
                 var fullPath = Path.Combine(_path, $"{baseName}.{_extension}");
                 return IsAvailable(fullPath) ? fullPath : null;
@@ -82,7 +83,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
             var counter = GetCurrentCounter(baseName);
 
-            while (counter < _maxFileCount)
+            while (counter < _maxFileCountPerPeriodicity)
             {
                 var fullName = Path.Combine(_path,$"{baseName}.{counter}.{_extension}");
                 if (!IsAvailable(fullName))
@@ -101,8 +102,6 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                 var fileInfo = new FileInfo(filename);
                 return !(_maxFileSize > 0 && fileInfo.Exists && fileInfo.Length > _maxFileSize);
             }
-
-            bool IsMultiFileEnabled() => (_maxFileCount ?? 1) == 1;
         }
 
         private int GetCurrentCounter(string baseName)
@@ -173,14 +172,20 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         {
             if (_maxRetainedFiles > 0)
             {
-                var files = new DirectoryInfo(_path)
+                var groupsToDelete = new DirectoryInfo(_path)
                     .GetFiles(_fileName + "*")
-                    .OrderByDescending(f => f.Name)
+                    .GroupBy(file => _maxFileCountPerPeriodicity == 1
+                        ? Path.GetFileNameWithoutExtension(file.Name)
+                        : Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(file.Name)))
+                    .OrderByDescending(f => f.Key)
                     .Skip(_maxRetainedFiles.Value);
 
-                foreach (var item in files)
+                foreach (var groupToDelete in groupsToDelete)
                 {
-                    item.Delete();
+                    foreach (var fileToDelete in groupToDelete)
+                    {
+                        fileToDelete.Delete();
+                    }
                 }
             }
         }

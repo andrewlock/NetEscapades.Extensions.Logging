@@ -158,7 +158,6 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 .OrderBy(f => f)
                 .ToArray();
 
-            Assert.Equal(6, actualFiles.Length);
             Assert.Equal(expectedFilenames, actualFiles);
         }
 
@@ -188,7 +187,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 "Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat:" + Environment.NewLine +
                 "Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0.txt")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.txt")));
         }
 
         [Fact]
@@ -208,7 +207,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             Assert.Equal(
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0.log")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.log")));
         }
 
         [Fact]
@@ -228,7 +227,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             Assert.Equal(
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0.log")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.log")));
         }
 
         [Fact]
@@ -248,7 +247,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             Assert.Equal(
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
-                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504.0")));
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
         }
     }
 }
