@@ -174,9 +174,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             {
                 var groupsToDelete = new DirectoryInfo(_path)
                     .GetFiles(_fileName + "*")
-                    .GroupBy(file => _maxFileCountPerPeriodicity == 1
-                        ? Path.GetFileNameWithoutExtension(file.Name)
-                        : Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(file.Name)))
+                    .GroupBy(file => GetFilenameForGrouping(file.Name))
                     .OrderByDescending(f => f.Key)
                     .Skip(_maxRetainedFiles.Value);
 
@@ -187,6 +185,19 @@ namespace NetEscapades.Extensions.Logging.RollingFile
                         fileToDelete.Delete();
                     }
                 }
+            }
+
+            string GetFilenameForGrouping(string filename)
+            {
+                var hasExtension = !string.IsNullOrEmpty(filename);
+                var isMultiFile = _maxFileCountPerPeriodicity > 1;
+                return (isMultiFile, hasExtension) switch
+                {
+                    (false, false) => filename,
+                    (false, true) => Path.GetFileNameWithoutExtension(filename),
+                    (true, false) => Path.GetFileNameWithoutExtension(filename),
+                    (true, true) => Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filename)),
+                };
             }
         }
     }
