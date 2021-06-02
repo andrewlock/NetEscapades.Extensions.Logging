@@ -158,7 +158,6 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 .OrderBy(f => f)
                 .ToArray();
 
-            Assert.Equal(6, actualFiles.Length);
             Assert.Equal(expectedFilenames, actualFiles);
         }
 
