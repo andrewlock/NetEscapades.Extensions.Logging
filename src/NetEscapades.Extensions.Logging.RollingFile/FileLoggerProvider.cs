@@ -38,7 +38,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
             var loggerOptions = options.CurrentValue;
             _path = loggerOptions.LogDirectory;
             _fileName = loggerOptions.FileName;
-            _extension = loggerOptions.Extension;
+            _extension = string.IsNullOrEmpty(loggerOptions.Extension) ? null : "." + loggerOptions.Extension;
             _maxFileSize = loggerOptions.FileSizeLimit;
             _maxRetainedFiles = loggerOptions.RetainedFileCountLimit;
             _maxFileCountPerPeriodicity = loggerOptions.FilesPerPeriodicityLimit ?? 1;
@@ -77,7 +77,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         {
             if (_maxFileCountPerPeriodicity == 1)
             {
-                var fullPath = Path.Combine(_path, $"{baseName}.{_extension}");
+                var fullPath = Path.Combine(_path, $"{baseName}{_extension}");
                 return IsAvailable(fullPath) ? fullPath : null;
             }
 
@@ -85,7 +85,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
             while (counter < _maxFileCountPerPeriodicity)
             {
-                var fullName = Path.Combine(_path,$"{baseName}.{counter}.{_extension}");
+                var fullName = Path.Combine(_path,$"{baseName}.{counter}{_extension}");
                 if (!IsAvailable(fullName))
                 {
                     counter++;
