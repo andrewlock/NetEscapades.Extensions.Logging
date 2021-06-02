@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
@@ -16,6 +17,15 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
+[GitHubActions("BuildAndPack",
+    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
+    GitHubActionsImage.MacOsLatest,
+    ImportGitHubTokenAs = nameof(GithubToken),
+    On = new[] {GitHubActionsTrigger.Push, GitHubActionsTrigger.PullRequest},
+    ImportSecrets = new[] {nameof(NuGetToken)},
+    InvokedTargets = new[] {nameof(Test), nameof(Pack), nameof(PushToGitHubPackages), nameof(PushToNuGet)}
+)]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
@@ -23,8 +33,7 @@ class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Test, x => x.Pack);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -35,6 +44,12 @@ class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "test";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+
+    readonly string GithubToken;
+    readonly string NuGetToken;
+    const string GithubPackagesUrl = "https://nuget.pkg.github.com/andrewlock/index.json";
+    bool IsTag => GitHubActions.Instance?.GitHubRef?.StartsWith("refs/tags/") ?? false;
+    bool IsPullRequest => !string.IsNullOrEmpty(GitHubActions.Instance?.GitHubHeadRef);
 
     Target Clean => _ => _
         .Before(Restore)
@@ -62,4 +77,59 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(Solution)
+                .SetConfiguration(Configuration)
+                .EnableNoBuild()
+                .EnableNoRestore());
+        });
+
+    Target Pack => _ => _
+        .DependsOn(Compile)
+        .After(Test)
+        .Produces(ArtifactsDirectory)
+        .Executes(() =>
+        {
+            var projects = SourceDirectory.GlobFiles("**/*.csproj");
+            DotNetPack(s => s
+                .SetConfiguration(Configuration)
+                .SetOutputDirectory(ArtifactsDirectory)
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .CombineWith(projects, (x, project) => x
+                    .SetProject(Solution.GetProject(project))));
+        });
+
+    Target PushToGitHubPackages => _ => _
+        .DependsOn(Compile)
+        .OnlyWhenStatic(() => !IsPullRequest && IsServerBuild && IsWin)
+        .After(Pack)
+        .Executes(() =>
+        {
+            var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
+            DotNetNuGetPush(s => s
+                .SetSource(GithubPackagesUrl)
+                .SetApiKey(GithubToken)
+                .EnableSkipDuplicate()
+                .CombineWith(packages, (x, package) => x
+                    .SetTargetPath(package)));
+        });
+
+    Target PushToNuGet => _ => _
+        .DependsOn(Compile)
+        .OnlyWhenStatic(() => IsTag && IsWin)
+        .After(Pack)
+        .Executes(() =>
+        {
+            var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
+            DotNetNuGetPush(s => s
+                .SetApiKey(NuGetToken)
+                .EnableSkipDuplicate()
+                .CombineWith(packages, (x, package) => x
+                    .SetTargetPath(package)));
+        });
 }
