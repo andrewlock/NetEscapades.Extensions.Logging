@@ -46,8 +46,8 @@ class Build : NukeBuild
     AbsolutePath TestsDirectory => RootDirectory / "test";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
-    readonly string GithubToken;
-    readonly string NuGetToken;
+    [Parameter] readonly string GithubToken;
+    [Parameter] readonly string NuGetToken;
     const string GithubPackagesUrl = "https://nuget.pkg.github.com/andrewlock/index.json";
     bool IsTag => GitHubActions.Instance?.GitHubRef?.StartsWith("refs/tags/") ?? false;
     bool IsPullRequest => !string.IsNullOrEmpty(GitHubActions.Instance?.GitHubHeadRef);
@@ -112,18 +112,10 @@ class Build : NukeBuild
         .After(Pack)
         .Executes(() =>
         {
-            var githubSource = "github";
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
-
-            DotNetNuGetAddSource(s => s
-                .SetSource(GithubPackagesUrl)
-                .SetUsername("andrewlock")
-                .SetPassword(GithubToken)
-                .EnableStorePasswordInClearText()
-                .SetName(githubSource));
-
             DotNetNuGetPush(s => s
-                .SetSource(githubSource)
+                .SetSource(GithubPackagesUrl)
+                .SetApiKey(GithubToken)
                 .EnableSkipDuplicate()
                 .CombineWith(packages, (x, package) => x
                     .SetTargetPath(package)));
