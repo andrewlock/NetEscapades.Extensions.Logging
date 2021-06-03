@@ -122,7 +122,7 @@ class Build : NukeBuild
 
     Target PushToNuGet => _ => _
         .DependsOn(Compile)
-        .OnlyWhenStatic(() => IsTag && IsWin)
+        .OnlyWhenStatic(() => IsTag && IsServerBuild && IsWin)
         .After(Pack)
         .Executes(() =>
         {
