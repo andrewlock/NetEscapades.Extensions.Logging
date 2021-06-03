@@ -1,5 +1,10 @@
 # Changelog
 
+## [v2.4.0]
+
+* Add support for splitting files by filesize (thanks @lafe)
+* Fix bug in AddFile(filename) ignoring file name (thanks @jfoshee)
+
 ## [v2.3.0]
 
 * Add support for .NET Core 3.0

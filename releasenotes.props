@@ -1,11 +1,12 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.3.0'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.4.0'">
       <![CDATA[
 
 Features:
 
-* Add support for .NET Core 3.0
+* Add support for splitting files by filesize (thanks @lafe)
+* Fix bug in AddFile(filename) ignoring file name (thanks @jfoshee)
 
 ]]>
     </PackageReleaseNotes>
