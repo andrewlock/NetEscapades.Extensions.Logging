@@ -105,30 +105,6 @@ class Build : NukeBuild
                     .SetProject(Solution.GetProject(project))));
         });
 
-    Target PushToGitHubPackages => _ => _
-        .DependsOn(Compile)
-        .OnlyWhenStatic(() => !IsPullRequest && IsServerBuild && IsWin)
-        .Requires(() => GithubToken)
-        .After(Pack)
-        .Executes(() =>
-        {
-            var githubSource = "github";
-            var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
-
-            DotNetNuGetAddSource(s => s
-                .SetSource(GithubPackagesUrl)
-                .SetUsername("andrewlock")
-                .SetPassword(GithubToken)
-                .EnableStorePasswordInClearText()
-                .SetName(githubSource));
-
-            DotNetNuGetPush(s => s
-                .SetSource(githubSource)
-                .EnableSkipDuplicate()
-                .CombineWith(packages, (x, package) => x
-                    .SetTargetPath(package)));
-        });
-
     Target PushToNuGet => _ => _
         .DependsOn(Compile)
         .OnlyWhenStatic(() => IsTag && IsServerBuild && IsWin)
