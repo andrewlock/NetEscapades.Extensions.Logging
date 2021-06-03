@@ -112,10 +112,18 @@ class Build : NukeBuild
         .After(Pack)
         .Executes(() =>
         {
+            var githubSource = "github";
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
-            DotNetNuGetPush(s => s
+
+            DotNetNuGetAddSource(s => s
                 .SetSource(GithubPackagesUrl)
-                .SetApiKey(GithubToken)
+                .SetUsername("andrewlock")
+                .SetPassword(GithubToken)
+                .EnableStorePasswordInClearText()
+                .SetName(githubSource));
+
+            DotNetNuGetPush(s => s
+                .SetSource(githubSource)
                 .EnableSkipDuplicate()
                 .CombineWith(packages, (x, package) => x
                     .SetTargetPath(package)));
