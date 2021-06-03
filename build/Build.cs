@@ -108,6 +108,7 @@ class Build : NukeBuild
     Target PushToGitHubPackages => _ => _
         .DependsOn(Compile)
         .OnlyWhenStatic(() => !IsPullRequest && IsServerBuild && IsWin)
+        .Requires(() => GithubToken)
         .After(Pack)
         .Executes(() =>
         {
@@ -123,6 +124,7 @@ class Build : NukeBuild
     Target PushToNuGet => _ => _
         .DependsOn(Compile)
         .OnlyWhenStatic(() => IsTag && IsServerBuild && IsWin)
+        .Requires(() => NuGetToken)
         .After(Pack)
         .Executes(() =>
         {
