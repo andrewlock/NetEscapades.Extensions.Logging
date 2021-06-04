@@ -38,8 +38,8 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Test Pack PushToGitHubPackages PushToNuGet'
-        run: ./build.cmd Test Pack PushToGitHubPackages PushToNuGet
+      - name: Run './build.cmd Test Pack PushToNuGet'
+        run: ./build.cmd Test Pack PushToNuGet
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
@@ -59,8 +59,8 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Test Pack PushToGitHubPackages PushToNuGet'
-        run: ./build.cmd Test Pack PushToGitHubPackages PushToNuGet
+      - name: Run './build.cmd Test Pack PushToNuGet'
+        run: ./build.cmd Test Pack PushToNuGet
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}
@@ -80,8 +80,8 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Test Pack PushToGitHubPackages PushToNuGet'
-        run: ./build.cmd Test Pack PushToGitHubPackages PushToNuGet
+      - name: Run './build.cmd Test Pack PushToNuGet'
+        run: ./build.cmd Test Pack PushToNuGet
         env:
           GithubToken: ${{ secrets.GITHUB_TOKEN }}
           NuGetToken: ${{ secrets.NUGET_TOKEN }}

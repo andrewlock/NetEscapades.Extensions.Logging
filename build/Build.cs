@@ -25,7 +25,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     OnPushBranches = new[] {"master", "main"},
     OnPullRequestBranches = new[] {"*"},
     ImportSecrets = new[] {nameof(NuGetToken)},
-    InvokedTargets = new[] {nameof(Test), nameof(Pack), nameof(PushToGitHubPackages), nameof(PushToNuGet)}
+    InvokedTargets = new[] {nameof(Test), nameof(Pack), nameof(PushToNuGet)}
 )]
 class Build : NukeBuild
 {
