@@ -22,6 +22,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.MacOsLatest,
     ImportGitHubTokenAs = nameof(GithubToken),
+    OnPushTags = new [] {"*"},
     OnPushBranches = new[] {"master", "main"},
     OnPullRequestBranches = new[] {"*"},
     ImportSecrets = new[] {nameof(NuGetToken)},
