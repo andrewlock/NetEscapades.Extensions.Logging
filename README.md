@@ -1,8 +1,7 @@
 # NetEscapades.Extensions.Logging
 
-[![Build status](https://ci.appveyor.com/api/projects/status/c4qsapcg741rp0b5?svg=true)](https://ci.appveyor.com/project/andrewlock/netescapades-extensions-logging)
+![Build status](https://github.com/andrewlock/NetEscapades.Extensions.Logging/actions/workflows/BuildAndPack.yml/badge.svg)
 [![NuGet RollingFile](https://img.shields.io/nuget/v/NetEscapades.Extensions.Logging.RollingFile.svg)](https://www.nuget.org/packages/NetEscapades.Extensions.Logging.RollingFile/)
-[![MyGet RollingFile CI](https://img.shields.io/myget/andrewlock-ci/v/NetEscapades.Extensions.Logging.RollingFile.svg)](http://myget.org/gallery/andrewlock-ci)
 
 ## NetEscapades.Extensions.Logging.RollingFile
 
@@ -56,6 +55,7 @@ public class Program
                 options.FileName = "diagnostics-"; // The log file prefixes
                 options.LogDirectory = "LogFiles"; // The directory to write the logs
                 options.FileSizeLimit = 20 * 1024 * 1024; // The maximum log file size (20MB here)
+                options.FilesPerPeriodicityLimit = 200; // When maximum file size is reached, create a new file, up to a limit of 200 files per periodicity
                 options.Extension = "txt"; // The log file extension
                 options.Periodicity = PeriodicityOptions.Hourly // Roll log files hourly instead of daily.
             })) 
