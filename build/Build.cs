@@ -49,9 +49,8 @@ class Build : NukeBuild
 
     [Parameter] readonly string GithubToken;
     [Parameter] readonly string NuGetToken;
-    const string GithubPackagesUrl = "https://nuget.pkg.github.com/andrewlock/index.json";
+    const string NugetOrgUrl = "https://api.nuget.org/v3/index.json";
     bool IsTag => GitHubActions.Instance?.GitHubRef?.StartsWith("refs/tags/") ?? false;
-    bool IsPullRequest => !string.IsNullOrEmpty(GitHubActions.Instance?.GitHubHeadRef);
 
     Target Clean => _ => _
         .Before(Restore)
@@ -116,6 +115,7 @@ class Build : NukeBuild
             var packages = ArtifactsDirectory.GlobFiles("*.nupkg");
             DotNetNuGetPush(s => s
                 .SetApiKey(NuGetToken)
+                .SetSource(NugetOrgUrl)
                 .EnableSkipDuplicate()
                 .CombineWith(packages, (x, package) => x
                     .SetTargetPath(package)));
