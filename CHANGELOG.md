@@ -1,5 +1,10 @@
 # Changelog
 
+## [v2.5.0]
+
+* Add initial support for using custom log-line formats. Uses the same format as before by default. 
+* Added a Json Log Formatter for .NET Core 3.1+
+
 ## [v2.4.1]
 * 
 * Fix bug in file rolling behaviour (thanks @guillermo-ruffino)

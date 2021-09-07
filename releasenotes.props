@@ -1,11 +1,12 @@
 <Project>
   <PropertyGroup>
-    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.4.1'">
+    <PackageReleaseNotes Condition="'$(VersionPrefix)' == '2.5.0'">
       <![CDATA[
 
 Features:
 
-* Fix bug in file rolling behaviour (thanks @guillermo-ruffino)
+* Add initial support for using custom log-line formats. Uses the same format as before by default.
+* Added a Json Log Formatter for .NET Core 3.1+
 
 ]]>
     </PackageReleaseNotes>
