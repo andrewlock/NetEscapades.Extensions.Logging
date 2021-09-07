@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 using NetEscapades.Extensions.Logging.RollingFile.Internal;
 
 namespace NetEscapades.Extensions.Logging.RollingFile
@@ -30,10 +31,11 @@ namespace NetEscapades.Extensions.Logging.RollingFile
         private readonly PeriodicityOptions _periodicity;
 
         /// <summary>
-        /// Creates an instance of the <see cref="FileLoggerProvider" /> 
+        /// Creates an instance of the <see cref="FileLoggerProvider" />
         /// </summary>
         /// <param name="options">The options object controlling the logger</param>
-        public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> options) : base(options)
+        /// <param name="formatter"></param>
+        public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> options, IEnumerable<ILogFormatter> formatter) : base(options, formatter)
         {
             var loggerOptions = options.CurrentValue;
             _path = loggerOptions.LogDirectory;

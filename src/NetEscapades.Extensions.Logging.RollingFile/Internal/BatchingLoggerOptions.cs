@@ -73,5 +73,11 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
         /// Defaults to <c>false</c>.
         /// </summary>
         public bool IncludeScopes { get; set; } = false;
+
+        /// <summary>
+        /// Gets of sets the name of the log message formatter to use.
+        /// Defaults to "simple" />.
+        /// </summary>
+        public string FormatterName { get; set; } = "simple";
     }
 }

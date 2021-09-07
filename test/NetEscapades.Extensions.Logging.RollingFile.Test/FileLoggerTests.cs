@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 using NetEscapades.Extensions.Logging.RollingFile.Internal;
 using Xunit;
 
@@ -112,7 +115,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
         [Fact]
         public async Task RespectsMaxFileCountWithMultiFilePeriodicity2()
         {
-            var provider = new TestFileLoggerProvider(TempPath, maxRetainedFiles: 5, maxFilesPerPeriodicity: 5, maxFileSize: 1);
+            var provider = new TestFileLoggerProvider(TempPath, maxFileSize: 1, maxRetainedFiles: 5, maxFilesPerPeriodicity: 5);
             var expectedFilenames = new[]
             {
                 "LogFile.20160509.0.txt",
@@ -248,6 +251,80 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 "2016-05-04 03:02:01.000 +00:00 [Information] Cat: Info message" + Environment.NewLine +
                 "2016-05-04 04:02:01.000 +00:00 [Error] Cat: Error message" + Environment.NewLine,
                 File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
+        }
+
+        [Fact]
+        public void CanCreateProviderWithTheDefaultFormatter()
+        {
+            var option = new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions());
+
+            var provider = new FileLoggerProvider(option, new List<ILogFormatter> {new SimpleLogFormatter()});
+
+            Assert.NotNull(provider);
+        }
+
+        [Fact]
+        public void WhenFormatterNotAvailable_Throws()
+        {
+            var option = new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
+            {
+                FormatterName = "unknown",
+            });
+
+            Assert.Throws<ArgumentException>(() =>
+                new FileLoggerProvider(option, new List<ILogFormatter> {new SimpleLogFormatter()}));
+        }
+
+        [Fact]
+        public void CanSelectFormatterByNameWhenMultiple()
+        {
+            var name = Guid.NewGuid().ToString().ToLowerInvariant();
+            var option = new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
+            {
+                FormatterName = name,
+            });
+
+            var formatters = new List<ILogFormatter>
+            {
+                new SimpleLogFormatter(),
+                new MessageOnlyFormatter(name),
+            };
+
+            var provider = new FileLoggerProvider(option, formatters);
+        }
+
+        [Fact]
+        public async Task CanUseCustomFormat()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: null, formatter: new MessageOnlyFormatter());
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            logger.Log(_timestampOne, LogLevel.Information, 0, "Info message", null, (state, ex) => state);
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 0, "Error message", null, (state, ex) => state);
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            Assert.Equal(
+                "Info message" + Environment.NewLine +
+                "Error message" + Environment.NewLine,
+                File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
+        }
+
+        public class MessageOnlyFormatter: ILogFormatter
+        {
+            public MessageOnlyFormatter(string name = "test")
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+            public void Write<TState>(in LogEntry<TState> logEntry, IExternalScopeProvider scopeProvider, StringBuilder stringBuilder)
+            {
+                stringBuilder.AppendLine(logEntry.Formatter(logEntry.State, logEntry.Exception));
+            }
         }
     }
 }
