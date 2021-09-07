@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+#if  NETCOREAPP2_1
+using Microsoft.Extensions.Logging.Internal;
+#endif
 using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 using NetEscapades.Extensions.Logging.RollingFile.Internal;
 using Xunit;
@@ -312,6 +315,78 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 "Error message" + Environment.NewLine,
                 File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
         }
+
+#if NETCOREAPP3_0
+        [Fact]
+        public async Task CanWriteJsonFormat()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: null, formatter: new JsonLogFormatter());
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            logger.Log(_timestampOne, LogLevel.Information, 1, CreateFormattedValues("Info message {Value}", 123), null, (state, ex) => state.ToString());
+            logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 2,
+                CreateFormattedValues("Error message {Value}", "value"), null, (state, ex) => state.ToString());
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            var expected =
+                @"{""Timestamp"":""2016-05-04T03:02:01+00:00"",""Level"":""Information"",""Category"":""Cat"",""Message"":""Info message 123"",""State"":{""Value"":123},""MessageTemplate"":""Info message {Value}""}"
+                + Environment.NewLine
+                + @"{""Timestamp"":""2016-05-04T04:02:01+00:00"",""Level"":""Error"",""Category"":""Cat"",""Message"":""Error message value"",""State"":{""Value"":""value""},""MessageTemplate"":""Error message {Value}""}"
+                + Environment.NewLine;
+            Assert.Equal(expected, File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
+        }
+
+        [Fact]
+        public async Task IncludesScopesInJsonFormat()
+        {
+            var provider = new TestFileLoggerProvider(TempPath, extension: null, formatter: new JsonLogFormatter(),
+                includeScopes: true);
+            ((ISupportExternalScope)provider).SetScopeProvider(new LoggerExternalScopeProvider());
+            var logger = (BatchingLogger)provider.CreateLogger("Cat");
+
+            await provider.IntervalControl.Pause;
+
+            // annoying the hoops we have to jump through here.
+
+            using(logger.BeginScope(new Dictionary<string, object>()
+            {
+                {"MyValues", "\"My escaped value \""},
+                {"OtherValue", "test!"},
+            }))
+            using (logger.BeginScope("Test value"))
+            using (logger.BeginScope("Test value"))
+            {
+                logger.Log(_timestampOne, LogLevel.Information, 1, CreateFormattedValues("Info message {Value}", 123), null, (state, ex) => state.ToString());
+                logger.Log(_timestampOne.AddHours(1), LogLevel.Error, 2,
+                    CreateFormattedValues("Error message {Value}", "value"), null, (state, ex) => state.ToString());
+            }
+
+            provider.IntervalControl.Resume();
+            await provider.IntervalControl.Pause;
+
+            var expected =
+                @"{""Timestamp"":""2016-05-04T03:02:01+00:00"",""Level"":""Information"",""Category"":""Cat"",""Message"":""Info message 123"",""State"":{""Value"":123},""MessageTemplate"":""Info message {Value}"",""MyValues"":""\u0022My escaped value \u0022"",""OtherValue"":""test!"",""Scopes"":[""Test value"",""Test value""]}"
+                + Environment.NewLine
+                + @"{""Timestamp"":""2016-05-04T04:02:01+00:00"",""Level"":""Error"",""Category"":""Cat"",""Message"":""Error message value"",""State"":{""Value"":""value""},""MessageTemplate"":""Error message {Value}"",""MyValues"":""\u0022My escaped value \u0022"",""OtherValue"":""test!"",""Scopes"":[""Test value"",""Test value""]}"
+                + Environment.NewLine;
+
+            Assert.Equal(expected, File.ReadAllText(Path.Combine(TempPath, "LogFile.20160504")));
+        }
+
+        private static object CreateFormattedValues(string msg, params object[] values)
+        {
+            // annoying the hoops we have to jump through here.
+            var formattedLogValuesType = typeof(ILoggerFactory).Assembly
+                .GetType("Microsoft.Extensions.Logging.FormattedLogValues");
+
+            var ctor = formattedLogValuesType.GetConstructor(new[] {typeof(string), typeof(object[])});
+            return ctor.Invoke(new object[] {msg, values});
+        }
+#endif
 
         public class MessageOnlyFormatter: ILogFormatter
         {

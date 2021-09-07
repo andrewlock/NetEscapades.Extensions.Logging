@@ -20,6 +20,9 @@ namespace Microsoft.Extensions.Logging
         {
             builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>();
             builder.Services.AddSingleton<ILogFormatter, SimpleLogFormatter>();
+#if NETCOREAPP3_0
+            builder.Services.AddSingleton<ILogFormatter, JsonLogFormatter>();
+#endif
             return builder;
         }
         
