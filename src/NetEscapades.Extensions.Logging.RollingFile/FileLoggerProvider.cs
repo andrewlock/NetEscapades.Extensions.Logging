@@ -189,7 +189,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile
 
             string GetFilenameForGrouping(string filename)
             {
-                var hasExtension = !string.IsNullOrEmpty(filename);
+                var hasExtension = !string.IsNullOrEmpty(_extension);
                 var isMultiFile = _maxFileCountPerPeriodicity > 1;
                 return (isMultiFile, hasExtension) switch
                 {
