@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.4.1]
+* 
+* Fix bug in file rolling behaviour (thanks @guillermo-ruffino)
+
 ## [v2.4.0]
 
 * Add support for splitting files by filesize (thanks @lafe)
