@@ -75,6 +75,7 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
+                .SetProperty("ContinuousIntegrationBuild", "true")
                 .EnableNoRestore());
         });
 
@@ -99,6 +100,7 @@ class Build : NukeBuild
             DotNetPack(s => s
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
+                .SetProperty("ContinuousIntegrationBuild", "true")
                 .EnableNoBuild()
                 .EnableNoRestore()
                 .CombineWith(projects, (x, project) => x
