@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using NetEscapades.Extensions.Logging.RollingFile;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 
 namespace Microsoft.Extensions.Logging
 {
@@ -18,6 +19,10 @@ namespace Microsoft.Extensions.Logging
         public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
         {
             builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>();
+            builder.Services.AddSingleton<ILogFormatter, SimpleLogFormatter>();
+#if NETCOREAPP3_0
+            builder.Services.AddSingleton<ILogFormatter, JsonLogFormatter>();
+#endif
             return builder;
         }
         

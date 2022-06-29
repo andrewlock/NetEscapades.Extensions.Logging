@@ -5,6 +5,7 @@
 using System;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 {
@@ -12,11 +13,13 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
     {
         private readonly BatchingLoggerProvider _provider;
         private readonly string _category;
+        private readonly ILogFormatter _formatter;
 
-        public BatchingLogger(BatchingLoggerProvider loggerProvider, string categoryName)
+        public BatchingLogger(BatchingLoggerProvider loggerProvider, string categoryName, ILogFormatter formatter)
         {
             _provider = loggerProvider;
             _category = categoryName;
+            _formatter = formatter;
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -37,35 +40,9 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
                 return;
             }
 
+            var logEntry = new LogEntry<TState>(timestamp, logLevel, _category, eventId, state, exception, formatter);
             var builder = new StringBuilder();
-            builder.Append(timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff zzz"));
-            builder.Append(" [");
-            builder.Append(logLevel.ToString());
-            builder.Append("] ");
-            builder.Append(_category);
-
-            var scopeProvider = _provider.ScopeProvider;
-            if (scopeProvider != null)
-            {
-                scopeProvider.ForEachScope((scope, stringBuilder) =>
-                {
-                    stringBuilder.Append(" => ").Append(scope);
-                }, builder);
-
-                builder.AppendLine(":");
-            }
-            else
-            {
-                builder.Append(": ");
-            }
-
-            builder.AppendLine(formatter(state, exception));
-
-            if (exception != null)
-            {
-                builder.AppendLine(exception.ToString());
-            }
-
+            _formatter.Write(in logEntry, _provider.ScopeProvider, builder);
             _provider.AddMessage(timestamp, builder.ToString());
         }
 

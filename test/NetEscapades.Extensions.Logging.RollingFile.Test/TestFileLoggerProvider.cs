@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Test
 {
@@ -15,7 +16,8 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             int maxFileSize = 32_000,
             int maxRetainedFiles = 100,
             int maxFilesPerPeriodicity = 1,
-            bool includeScopes = false)
+            bool includeScopes = false,
+            ILogFormatter formatter = null)
             : base(new OptionsWrapperMonitor<FileLoggerOptions>(new FileLoggerOptions()
             {
                 LogDirectory = path,
@@ -25,8 +27,9 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
                 RetainedFileCountLimit = maxRetainedFiles,
                 FilesPerPeriodicityLimit = maxFilesPerPeriodicity,
                 IsEnabled = true,
-                IncludeScopes = includeScopes
-            }))
+                IncludeScopes = includeScopes,
+                FormatterName = formatter?.Name ?? "simple"
+            }), new[] { formatter ?? new SimpleLogFormatter()})
         {
         }
 
@@ -35,5 +38,4 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Test
             return IntervalControl.IntervalAsync();
         }
     }
-
 }

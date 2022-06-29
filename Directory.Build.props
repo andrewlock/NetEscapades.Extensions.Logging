@@ -10,7 +10,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/andrewlock/NetEscapades.Extensions.Logging</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/andrewlock/NetEscapades.Extensions.Logging.RollingFile</RepositoryUrl><RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/andrewlock/NetEscapades.Extensions.Logging</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <DebugType>embedded</DebugType>
     <IsPackable>false</IsPackable>

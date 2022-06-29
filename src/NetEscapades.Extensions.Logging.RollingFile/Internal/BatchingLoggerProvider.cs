@@ -5,10 +5,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NetEscapades.Extensions.Logging.RollingFile.Formatters;
 
 namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 {
@@ -26,10 +28,11 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 
         private bool _includeScopes;
         private IExternalScopeProvider _scopeProvider;
+        private readonly ILogFormatter _formatter;
 
         internal IExternalScopeProvider ScopeProvider => _includeScopes ? _scopeProvider : null;
 
-        protected BatchingLoggerProvider(IOptionsMonitor<BatchingLoggerOptions> options)
+        protected BatchingLoggerProvider(IOptionsMonitor<BatchingLoggerOptions> options, IEnumerable<ILogFormatter> formatters)
         {
             // NOTE: Only IsEnabled and IncludeScopes are monitored
 
@@ -43,6 +46,19 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
                 throw new ArgumentOutOfRangeException(nameof(loggerOptions.FlushPeriod), $"{nameof(loggerOptions.FlushPeriod)} must be longer than zero.");
             }
 
+            var formatterName = (string.IsNullOrEmpty(loggerOptions.FormatterName)
+                ? "simple"
+                : loggerOptions.FormatterName).ToLowerInvariant();
+            var formatter = formatters.FirstOrDefault(x => x.Name == formatterName);
+
+            if (formatter is null)
+            {
+                throw new ArgumentException(
+                    $"Unknown formatter name {formatterName} - ensure custom formatters are registered correctly with the DI container",
+                    nameof(loggerOptions.FormatterName));
+            }
+
+            _formatter = formatter;
             _interval = loggerOptions.FlushPeriod;
             _batchSize = loggerOptions.BatchSize;
             _queueSize = loggerOptions.BackgroundQueueSize;
@@ -163,7 +179,7 @@ namespace NetEscapades.Extensions.Logging.RollingFile.Internal
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new BatchingLogger(this, categoryName);
+            return new BatchingLogger(this, categoryName, _formatter);
         }
 
         void ISupportExternalScope.SetScopeProvider(IExternalScopeProvider scopeProvider)
